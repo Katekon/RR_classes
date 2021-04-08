@@ -1,15 +1,40 @@
 ---
 title: "(R)Markdown"
 author: "Wojciech Hardy; Michał Paliński"
-date: "3/21/2021"
-output: html_document
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      smooth_scroll: true
+      collapsed: true
+    number_sections: true
+    toc_depth: 2
+    self_contained: true
+    code_folding: hide
+params:
+  year: 
+    label: "Year"
+    value: 2017
+    input: slider
+    min: 2010
+    max: 2018
+    step: 1
+    sep: ""
+  region: Europe
+  printcode: TRUE
+  data: file.csv
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(reticulate)
 library(chron)
-py_install("pandas")
+#py_install("pandas")
+```
+
+```{r}
+data <- read.csv(params$data)
 ```
 
 ---
@@ -74,7 +99,7 @@ Subscripts can be done like so: `H~2~O` H~2~O
 
 ---
 
-# Lists
+# Lists {.tabset}
 
 ## Ordered
 
@@ -165,23 +190,6 @@ plot(pressure)
 
 ```
 
-You can also use Python within the RMarkdown document like so:
-
-```{python}
-import pandas
-flights = pandas.read_csv("Data/flights.csv")
-flights = flights[flights['dest'] == "ORD"]
-flights = flights[['carrier', 'dep_delay', 'arr_delay']]
-flights = flights.dropna()
-```
-
-```{r}
-library(ggplot2)
-ggplot(py$flights, aes(carrier, arr_delay)) + geom_point() + geom_jitter()
-
-cat("Example from: https://rstudio.github.io/reticulate/articles/r_markdown.html")
-```
-
 And a nice table alternative -> `kable` from the `knitr` package.
 
 ```{r}
@@ -234,19 +242,10 @@ cat("It's not the weekend! :(")
 
 ## Handling errors
 
-```{r, error=TRUE}
-543 + "clearly a text and not a number"
-```
-
 By default RMarkdown stops after encountering an error. We can tell it to continue.
 
 ## Caching results that take long to compute
 
-```{r slow_chunk, cache=TRUE}
-Sys.sleep(10)
-a <- 4
-a
-```
 The chunk gets reevaluated if anything changes within the chunk. **Make sure you know what you're doing when caching**. 
 
 We can use `cache.extra =` to specify additional conditions for cache invalidation (i.e. to repeat the calculations), e.g.:
@@ -320,11 +319,6 @@ plot(cars)
 
 ### Hide the results with `results='hide'`
 
-```{r, results='hide'}
-
-a*typical_height*typical_width
-  
-```
 
 ### Generate Markdown content with R code with `results='asis'`
 
